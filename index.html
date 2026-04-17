@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>漆黒の言霊 -Grimoire of the Abyss-</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #8b0000;
+            --blood-red: #ff0000;
+            --dark-bg: #030000;
+        }
+
+        body {
+            font-family: 'Noto Serif JP', serif;
+            background-color: var(--dark-bg);
+            color: #d1d5db;
+            overflow-x: hidden;
+            cursor: crosshair;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(139, 0, 0, 0.05) 0%, transparent 60%),
+                linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9)),
+                url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.05"/></svg>');
+            background-attachment: fixed;
+        }
+
+        .eng-font {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* マウスストーカー（禍々しいオーラ） */
+        #cursor-glow {
+            position: fixed;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(139, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            transition: width 0.2s, height 0.2s;
+        }
+
+        /* スクロールフェードイン */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+            transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            filter: blur(5px);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
+
+        /* 血のようなテキストシャドウ */
+        .blood-shadow {
+            text-shadow: 0 0 10px rgba(139, 0, 0, 0.8), 0 0 20px rgba(139, 0, 0, 0.4);
+        }
+
+        /* グリッチエフェクト */
+        .glitch-wrapper {
+            position: relative;
+        }
+
+        .glitch {
+            position: relative;
+            color: #fff;
+        }
+
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark-bg);
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 var(--blood-red);
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #0000ff;
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(10px, 9999px, 80px, 0); transform: translate(0); }
+            20% { clip: rect(50px, 9999px, 10px, 0); transform: translate(-2px, 2px); }
+            40% { clip: rect(30px, 9999px, 90px, 0); transform: translate(2px, -2px); }
+            60% { clip: rect(80px, 9999px, 30px, 0); transform: translate(-2px, 0); }
+            80% { clip: rect(20px, 9999px, 60px, 0); transform: translate(2px, 2px); }
+            100% { clip: rect(90px, 9999px, 20px, 0); transform: translate(0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(60px, 9999px, 10px, 0); transform: translate(0); }
+            20% { clip: rect(10px, 9999px, 80px, 0); transform: translate(2px, -2px); }
+            40% { clip: rect(90px, 9999px, 30px, 0); transform: translate(-2px, 2px); }
+            60% { clip: rect(30px, 9999px, 60px, 0); transform: translate(2px, 0); }
+            80% { clip: rect(80px, 9999px, 20px, 0); transform: translate(-2px, -2px); }
+            100% { clip: rect(20px, 9999px, 90px, 0); transform: translate(0); }
+        }
+
+        /* 脈打つアニメーション */
+        .pulse-slow {
+            animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* スクロールバーのカスタマイズ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-red);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--blood-red);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-red-900 selection:text-white">
+
+    <div id="cursor-glow"></div>
+
+    <!-- オーバーレイノイズ -->
+    <div class="fixed inset-0 pointer-events-none z-50 mix-blend-overlay opacity-20" style="background-image: url('data:image/svg+xml;utf8,<svg viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\"><filter id=\"noiseFilter\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.8\" numOctaves=\"3\" stitchTiles=\"stitch\"/></filter><rect width=\"100%\" height=\"100%\" filter=\"url(%23noiseFilter)\"/></svg>');"></div>
+
+    <header class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4">
+        <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none select-none overflow-hidden">
+            <span class="eng-font text-[20vw] leading-none whitespace-nowrap text-red-600 pulse-slow">ABYSS</span>
+        </div>
+
+        <p class="text-sm md:text-lg tracking-[0.5em] text-red-800 mb-6 pulse-slow">―― 警告：精神汚染の危険性あり ――</p>
+        
+        <div class="glitch-wrapper mb-8">
+            <h1 class="eng-font text-5xl md:text-7xl lg:text-8xl font-black text-center tracking-wider glitch blood-shadow" data-text="Grimoire of the Abyss">
+                Grimoire of the Abyss
+            </h1>
+        </div>
+        
+        <h2 class="text-2xl md:text-4xl font-bold tracking-[0.2em] text-gray-300 mb-12">
+            漆 黒 の 辞 書
+        </h2>
+        
+        <div class="max-w-2xl text-center space-y-4 text-gray-400 text-sm md:text-base leading-relaxed tracking-widest border-t border-b border-red-900/50 py-8">
+            <p>我が深淵に触れし者よ。</p>
+            <p>ここにあるのは、世界を形作る<span class="text-red-500">『概念』</span>の残骸。</p>
+            <p>安易に口にすれば、己の魂を喰われるであろう。</p>
+            <p class="mt-8 text-xs text-red-800">↓ スクロールして封印を解く ↓</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-24">
+        <!-- 辞書リストコンテナ -->
+        <div id="dictionary" class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
+            <!-- JSでここに単語が生成されます -->
+        </div>
+
+        <div class="mt-32 text-center reveal">
+            <p class="eng-font text-4xl text-red-900 mb-4 blood-shadow">To be continued in the dark...</p>
+            <p class="text-gray-600 tracking-widest text-sm">あなたの右腕が疼く時、再びこの地を訪れよ。</p>
+        </div>
+    </main>
+
+    <footer class="py-12 border-t border-red-900/30 text-center mt-20">
+        <p class="eng-font text-gray-700 text-sm tracking-widest">© 2026 The Syndicate of the Black Flame. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // 中二病英単語リスト
+        const words = [
+            { eng: "Abyss", jp: "深淵", ruby: "アビス", desc: "光すら届かぬ絶望の底。すべてを飲み込む虚無の入り口。" },
+            { eng: "Apocalypse", jp: "黙示録", ruby: "アポカリプス", desc: "世界の終焉を告げる予言。破壊と再生の始まり。" },
+            { eng: "Bloodshed", jp: "流血", ruby: "ブラッドシェッド", desc: "紅蓮に染まる大地。闘争がもたらす避けられぬ代償。" },
+            { eng: "Catastrophe", jp: "大破局", ruby: "カタストロフィ", desc: "抗うことすら許されぬ、星の理（ことわり）の崩壊。" },
+            { eng: "Chaos", jp: "混沌", ruby: "カオス", desc: "秩序が意味を成さない原初の姿。真なる自由。" },
+            { eng: "Destiny", jp: "宿命", ruby: "デスティニー", desc: "神々が紡いだ残酷なるシナリオ。我々は操り人形に過ぎない。" },
+            { eng: "Despair", jp: "絶望", ruby: "ディスペア", desc: "希望の裏側にある真実。心が砕け散る甘美なる音。" },
+            { eng: "Eternity", jp: "永遠", ruby: "エタニティ", desc: "時という概念の死。呪いにも似た果てなき旅路。" },
+            { eng: "Genesis", jp: "創世記", ruby: "ジェネシス", desc: "無から有が生み出された奇跡。あるいは、新たなる悲劇の幕開け。" },
+            { eng: "Heresy", jp: "異端", ruby: "ヘレシー", desc: "神の定めたルールに背く者。真理に最も近い罪人。" },
+            { eng: "Illusion", jp: "幻影", ruby: "イリュージョン", desc: "網膜に焼き付いた虚構。信じた時点でそれは現実となる。" },
+            { eng: "Judgement", jp: "審判", ruby: "ジャッジメント", desc: "天秤にかけられる魂の重さ。有罪（ギルティ）か、無罪（イノセント）か。" },
+            { eng: "Karma", jp: "業", ruby: "カルマ", desc: "前世から続く呪縛の鎖。血で血を洗う因果律。" },
+            { eng: "Labyrinth", jp: "迷宮", ruby: "ラビリンス", desc: "一度足を踏み入れれば、二度と太陽を拝めない無限の回廊。" },
+            { eng: "Madness", jp: "狂気", ruby: "マッドネス", desc: "常識という殻を破った先にある、もう一つの正気。" },
+            { eng: "Nemesis", jp: "復讐の女神", ruby: "ネメシス", desc: "傲慢なる者に下される神罰。逃れることは不可能。" },
+            { eng: "Nightmare", jp: "悪夢", ruby: "ナイトメア", desc: "眠りの淵で見る現実の影。目覚めても終わらない。" },
+            { eng: "Oblivion", jp: "忘却", ruby: "オブリビオン", desc: "記憶の海への沈水。すべてが無に帰す安らぎ。" },
+            { eng: "Paradox", jp: "逆説", ruby: "パラドックス", desc: "真理と真理が衝突し、世界に生じたバグ。" },
+            { eng: "Phantom", jp: "亡霊", ruby: "ファントム", desc: "この世に未練を残し、彷徨い続ける哀れなる魂の残滓。" },
+            { eng: "Qliphoth", jp: "邪悪の樹", ruby: "クリフォト", desc: "生命の樹の影に潜む、悪徳と崩壊の象徴。" },
+            { eng: "Ragnarok", jp: "終末", ruby: "ラグナロク", desc: "神々すらも死に絶える、最終戦争の炎。" },
+            { eng: "Rebellion", jp: "反逆", ruby: "リベリオン", desc: "運命の歯車に砂を噛ませる、気高き魂の咆哮。" },
+            { eng: "Resonance", jp: "共鳴", ruby: "レゾナンス", desc: "波長が重なり合い、世界を揺るがす特異点。" },
+            { eng: "Requiem", jp: "鎮魂歌", ruby: "レクイエム", desc: "散りゆく者へ手向ける、血塗られた旋律。" },
+            { eng: "Sacrifice", jp: "犠牲", ruby: "サクリファイス", desc: "大いなる奇跡を代償に、祭壇へ捧げられる供物。" },
+            { eng: "Sanctuary", jp: "聖域", ruby: "サンクチュアリ", desc: "穢れを知らぬ不可侵の領域。故に、最も血に飢えている。" },
+            { eng: "Tragedy", jp: "悲劇", ruby: "トラジェディ", desc: "神が退屈しのぎに書いた、美しくも残酷な喜劇。" },
+            { eng: "Twilight", jp: "黄昏", ruby: "トワイライト", desc: "光と闇が交差する境界線。魔が逢う時刻（とき）。" },
+            { eng: "Utopia", jp: "理想郷", ruby: "ユートピア", desc: "何処にも無い場所。それを探すこと自体が狂気の始まり。" },
+            { eng: "Vengeance", jp: "復讐", ruby: "ヴェンジェンス", desc: "冷たくして食すのが最も美味なる、黒き衝動。" },
+            { eng: "Void", jp: "虚無", ruby: "ヴォイド", desc: "色も音も存在しない。ただ「無い」という概念だけが存在する空間。" },
+            { eng: "Wicked", jp: "邪悪", ruby: "ウィキッド", desc: "善の対義語ではない。己の欲求にのみ忠実な純粋さ。" },
+            { eng: "Yggdrasil", jp: "世界樹", ruby: "ユグドラシル", desc: "九つの世界を支える巨大な柱。その根は毒竜に齧られている。" },
+            { eng: "Zenith", jp: "頂点", ruby: "ゼニス", desc: "天の極み。そこに立つ者は、圧倒的な孤独を抱える。" }
+        ];
+
+        const dictContainer = document.getElementById('dictionary');
+
+        // 単語要素の生成
+        words.forEach((word, index) => {
+            const num = String(index + 1).padStart(3, '0');
+            const delay = (index % 2) * 0.2; // 左右で少しフェードインのタイミングをずらす
+
+            const html = `
+                <div class="reveal flex flex-col group relative" style="transition-delay: ${delay}s;">
+                    <!-- 装飾的な線と数字 -->
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="eng-font text-red-900 text-sm tracking-widest">No.${num}</span>
+                        <div class="h-px bg-gradient-to-r from-red-900/50 to-transparent flex-grow"></div>
+                    </div>
+                    
+                    <!-- メインワード -->
+                    <div class="relative">
+                        <ruby class="text-sm md:text-base text-gray-500 tracking-[0.3em] font-bold mb-1 block">
+                            ${word.jp}<rt class="text-[0.6rem] text-red-700 font-normal tracking-widest">${word.ruby}</rt>
+                        </ruby>
+                        <h3 class="eng-font text-3xl md:text-5xl font-bold text-gray-200 tracking-widest group-hover:text-red-500 transition-colors duration-500 blood-shadow">
+                            ${word.eng}
+                        </h3>
+                    </div>
+
+                    <!-- 解説文 -->
+                    <p class="mt-4 text-xs md:text-sm text-gray-400 tracking-wider leading-relaxed border-l-2 border-red-900/30 pl-4 group-hover:border-red-600 transition-colors duration-500">
+                        ${word.desc}
+                    </p>
+
+                    <!-- ホバー時の背景オーラ -->
+                    <div class="absolute inset-0 bg-red-900/5 blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+                </div>
+            `;
+            dictContainer.innerHTML += html;
+        });
+
+        // Intersection Observer for scroll animation (フェードインエフェクト)
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target); // 一度表示されたら監視を解除
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(element => {
+            observer.observe(element);
+        });
+
+        // マウスストーカー (禍々しいオーラ)
+        const cursorGlow = document.getElementById('cursor-glow');
+        
+        document.addEventListener('mousemove', (e) => {
+            // requestAnimationFrameを使用してスムーズに追従
+            requestAnimationFrame(() => {
+                cursorGlow.style.left = `${e.clientX}px`;
+                cursorGlow.style.top = `${e.clientY}px`;
+            });
+        });
+
+        // マウスクリックでオーラが広がる演出
+        document.addEventListener('mousedown', () => {
+            cursorGlow.style.width = '300px';
+            cursorGlow.style.height = '300px';
+            cursorGlow.style.background = 'radial-gradient(circle, rgba(255, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0) 70%)';
+        });
+
+        document.addEventListener('mouseup', () => {
+            cursorGlow.style.width = '150px';
+            cursorGlow.style.height = '150px';
+            cursorGlow.style.background = 'radial-gradient(circle, rgba(139, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0) 70%)';
+        });
+    </script>
+</body>
+</html>
