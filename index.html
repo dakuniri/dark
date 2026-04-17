@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>漆黒の言霊 -Grimoire of the Abyss-</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700;900&display=swap" rel="stylesheet">
@@ -21,18 +22,36 @@
             color: #d1d5db;
             overflow-x: hidden;
             cursor: crosshair;
-            background-image: 
-                radial-gradient(circle at 50% 50%, rgba(139, 0, 0, 0.05) 0%, transparent 60%),
-                linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9)),
-                url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.05"/></svg>');
-            background-attachment: fixed;
+        }
+
+        /* 3Dキャンバスの背景 */
+        #webgl-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, rgba(20, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 100%);
+        }
+
+        /* ノイズオーバーレイ */
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            mix-blend-mode: overlay;
+            opacity: 0.3;
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)"/></svg>');
         }
 
         .eng-font {
             font-family: 'Cinzel', serif;
         }
 
-        /* マウスストーカー（禍々しいオーラ） */
+        /* マウスストーカー */
         #cursor-glow {
             position: fixed;
             width: 150px;
@@ -59,41 +78,25 @@
             filter: blur(0);
         }
 
-        /* 血のようなテキストシャドウ */
         .blood-shadow {
             text-shadow: 0 0 10px rgba(139, 0, 0, 0.8), 0 0 20px rgba(139, 0, 0, 0.4);
         }
 
         /* グリッチエフェクト */
-        .glitch-wrapper {
-            position: relative;
-        }
-
-        .glitch {
-            position: relative;
-            color: #fff;
-        }
-
+        .glitch-wrapper { position: relative; }
+        .glitch { position: relative; color: #fff; }
         .glitch::before, .glitch::after {
             content: attr(data-text);
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--dark-bg);
+            top: 0; left: 0; width: 100%; height: 100%;
         }
-
         .glitch::before {
-            left: 2px;
-            text-shadow: -2px 0 var(--blood-red);
+            left: 2px; text-shadow: -2px 0 var(--blood-red);
             clip: rect(24px, 550px, 90px, 0);
             animation: glitch-anim-2 3s infinite linear alternate-reverse;
         }
-
         .glitch::after {
-            left: -2px;
-            text-shadow: -2px 0 #0000ff;
+            left: -2px; text-shadow: -2px 0 #0000ff;
             clip: rect(85px, 550px, 140px, 0);
             animation: glitch-anim 2.5s infinite linear alternate-reverse;
         }
@@ -106,7 +109,6 @@
             80% { clip: rect(20px, 9999px, 60px, 0); transform: translate(2px, 2px); }
             100% { clip: rect(90px, 9999px, 20px, 0); transform: translate(0); }
         }
-
         @keyframes glitch-anim-2 {
             0% { clip: rect(60px, 9999px, 10px, 0); transform: translate(0); }
             20% { clip: rect(10px, 9999px, 80px, 0); transform: translate(2px, -2px); }
@@ -116,65 +118,62 @@
             100% { clip: rect(20px, 9999px, 90px, 0); transform: translate(0); }
         }
 
-        /* 脈打つアニメーション */
-        .pulse-slow {
-            animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
+        .pulse-slow { animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-        /* スクロールバーのカスタマイズ */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #000;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-red);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--blood-red);
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--blood-red); }
     </style>
 </head>
 <body class="antialiased selection:bg-red-900 selection:text-white">
 
     <div id="cursor-glow"></div>
+    
+    <!-- Three.js Canvas -->
+    <div id="webgl-container"></div>
+    <div class="noise-overlay"></div>
 
-    <!-- オーバーレイノイズ -->
-    <div class="fixed inset-0 pointer-events-none z-50 mix-blend-overlay opacity-20" style="background-image: url('data:image/svg+xml;utf8,<svg viewBox=\"0 0 200 200\" xmlns=\"http://www.w3.org/2000/svg\"><filter id=\"noiseFilter\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.8\" numOctaves=\"3\" stitchTiles=\"stitch\"/></filter><rect width=\"100%\" height=\"100%\" filter=\"url(%23noiseFilter)\"/></svg>');"></div>
-
-    <header class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4">
+    <!-- Prologue (Header) -->
+    <header class="h-[100vh] flex flex-col items-center justify-center relative overflow-hidden px-4 z-10">
         <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none select-none overflow-hidden">
             <span class="eng-font text-[20vw] leading-none whitespace-nowrap text-red-600 pulse-slow">ABYSS</span>
         </div>
-
         <p class="text-sm md:text-lg tracking-[0.5em] text-red-800 mb-6 pulse-slow">―― 警告：精神汚染の危険性あり ――</p>
-        
         <div class="glitch-wrapper mb-8">
             <h1 class="eng-font text-5xl md:text-7xl lg:text-8xl font-black text-center tracking-wider glitch blood-shadow" data-text="Grimoire of the Abyss">
                 Grimoire of the Abyss
             </h1>
         </div>
-        
-        <h2 class="text-2xl md:text-4xl font-bold tracking-[0.2em] text-gray-300 mb-12">
-            漆 黒 の 辞 書
-        </h2>
-        
+        <h2 class="text-2xl md:text-4xl font-bold tracking-[0.2em] text-gray-300 mb-12">漆 黒 の 辞 書</h2>
         <div class="max-w-2xl text-center space-y-4 text-gray-400 text-sm md:text-base leading-relaxed tracking-widest border-t border-b border-red-900/50 py-8">
             <p>我が深淵に触れし者よ。</p>
             <p>ここにあるのは、世界を形作る<span class="text-red-500">『概念』</span>の残骸。</p>
             <p>安易に口にすれば、己の魂を喰われるであろう。</p>
-            <p class="mt-8 text-xs text-red-800">↓ スクロールして封印を解く ↓</p>
+            <p class="mt-8 text-xs text-red-800 animate-bounce">↓ スクロールして封印を解く ↓</p>
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-4 py-24">
-        <!-- 辞書リストコンテナ -->
+    <!-- アニメーション用スクロール領域 (2画面分の長さを確保) -->
+    <div id="coffin-scroll-area" class="h-[250vh] relative z-10 pointer-events-none">
+        <div class="sticky top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center" id="seal-text-container">
+            <div class="eng-font text-red-600 text-3xl md:text-6xl tracking-[0.5em] font-black glitch blood-shadow opacity-0 transition-opacity duration-300" data-text="UNSEALING..." id="seal-text-main">
+                UNSEALING...
+            </div>
+            <div class="text-gray-400 text-sm md:text-xl tracking-[1em] mt-6 opacity-0 transition-opacity duration-300" id="seal-text-sub">
+                封印解除
+            </div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ (棺が開いた後に表示) -->
+    <main id="main-content" class="relative z-10 max-w-5xl mx-auto px-4 py-24 opacity-0 transition-all duration-1000 transform translate-y-10 pointer-events-none">
+        <div class="mb-16 text-center border-b border-red-900/30 pb-8">
+            <h3 class="eng-font text-4xl text-red-700 mb-2 blood-shadow">THE REVELATION</h3>
+            <p class="text-gray-500 tracking-widest text-sm">解放されし言霊たち</p>
+        </div>
+
         <div id="dictionary" class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
             <!-- JSでここに単語が生成されます -->
         </div>
@@ -183,14 +182,16 @@
             <p class="eng-font text-4xl text-red-900 mb-4 blood-shadow">To be continued in the dark...</p>
             <p class="text-gray-600 tracking-widest text-sm">あなたの右腕が疼く時、再びこの地を訪れよ。</p>
         </div>
+        
+        <footer class="py-12 text-center mt-20">
+            <p class="eng-font text-gray-700 text-sm tracking-widest">© 2026 The Syndicate of the Black Flame.</p>
+        </footer>
     </main>
 
-    <footer class="py-12 border-t border-red-900/30 text-center mt-20">
-        <p class="eng-font text-gray-700 text-sm tracking-widest">© 2026 The Syndicate of the Black Flame. All rights reserved.</p>
-    </footer>
-
     <script>
-        // 中二病英単語リスト
+        // ==========================================
+        // 1. 中二病英単語リストの生成
+        // ==========================================
         const words = [
             { eng: "Abyss", jp: "深淵", ruby: "アビス", desc: "光すら届かぬ絶望の底。すべてを飲み込む虚無の入り口。" },
             { eng: "Apocalypse", jp: "黙示録", ruby: "アポカリプス", desc: "世界の終焉を告げる予言。破壊と再生の始まり。" },
@@ -208,44 +209,22 @@
             { eng: "Labyrinth", jp: "迷宮", ruby: "ラビリンス", desc: "一度足を踏み入れれば、二度と太陽を拝めない無限の回廊。" },
             { eng: "Madness", jp: "狂気", ruby: "マッドネス", desc: "常識という殻を破った先にある、もう一つの正気。" },
             { eng: "Nemesis", jp: "復讐の女神", ruby: "ネメシス", desc: "傲慢なる者に下される神罰。逃れることは不可能。" },
-            { eng: "Nightmare", jp: "悪夢", ruby: "ナイトメア", desc: "眠りの淵で見る現実の影。目覚めても終わらない。" },
-            { eng: "Oblivion", jp: "忘却", ruby: "オブリビオン", desc: "記憶の海への沈水。すべてが無に帰す安らぎ。" },
-            { eng: "Paradox", jp: "逆説", ruby: "パラドックス", desc: "真理と真理が衝突し、世界に生じたバグ。" },
-            { eng: "Phantom", jp: "亡霊", ruby: "ファントム", desc: "この世に未練を残し、彷徨い続ける哀れなる魂の残滓。" },
-            { eng: "Qliphoth", jp: "邪悪の樹", ruby: "クリフォト", desc: "生命の樹の影に潜む、悪徳と崩壊の象徴。" },
-            { eng: "Ragnarok", jp: "終末", ruby: "ラグナロク", desc: "神々すらも死に絶える、最終戦争の炎。" },
-            { eng: "Rebellion", jp: "反逆", ruby: "リベリオン", desc: "運命の歯車に砂を噛ませる、気高き魂の咆哮。" },
-            { eng: "Resonance", jp: "共鳴", ruby: "レゾナンス", desc: "波長が重なり合い、世界を揺るがす特異点。" },
             { eng: "Requiem", jp: "鎮魂歌", ruby: "レクイエム", desc: "散りゆく者へ手向ける、血塗られた旋律。" },
             { eng: "Sacrifice", jp: "犠牲", ruby: "サクリファイス", desc: "大いなる奇跡を代償に、祭壇へ捧げられる供物。" },
             { eng: "Sanctuary", jp: "聖域", ruby: "サンクチュアリ", desc: "穢れを知らぬ不可侵の領域。故に、最も血に飢えている。" },
-            { eng: "Tragedy", jp: "悲劇", ruby: "トラジェディ", desc: "神が退屈しのぎに書いた、美しくも残酷な喜劇。" },
-            { eng: "Twilight", jp: "黄昏", ruby: "トワイライト", desc: "光と闇が交差する境界線。魔が逢う時刻（とき）。" },
-            { eng: "Utopia", jp: "理想郷", ruby: "ユートピア", desc: "何処にも無い場所。それを探すこと自体が狂気の始まり。" },
-            { eng: "Vengeance", jp: "復讐", ruby: "ヴェンジェンス", desc: "冷たくして食すのが最も美味なる、黒き衝動。" },
-            { eng: "Void", jp: "虚無", ruby: "ヴォイド", desc: "色も音も存在しない。ただ「無い」という概念だけが存在する空間。" },
-            { eng: "Wicked", jp: "邪悪", ruby: "ウィキッド", desc: "善の対義語ではない。己の欲求にのみ忠実な純粋さ。" },
-            { eng: "Yggdrasil", jp: "世界樹", ruby: "ユグドラシル", desc: "九つの世界を支える巨大な柱。その根は毒竜に齧られている。" },
-            { eng: "Zenith", jp: "頂点", ruby: "ゼニス", desc: "天の極み。そこに立つ者は、圧倒的な孤独を抱える。" }
+            { eng: "Void", jp: "虚無", ruby: "ヴォイド", desc: "色も音も存在しない。ただ「無い」という概念だけが存在する空間。" }
         ];
 
         const dictContainer = document.getElementById('dictionary');
-
-        // 単語要素の生成
         words.forEach((word, index) => {
             const num = String(index + 1).padStart(3, '0');
-            const delay = (index % 2) * 0.2; // 左右で少しフェードインのタイミングをずらす
-
             const html = `
-                <div class="reveal flex flex-col group relative" style="transition-delay: ${delay}s;">
-                    <!-- 装飾的な線と数字 -->
+                <div class="reveal flex flex-col group relative">
                     <div class="flex items-center gap-4 mb-2">
                         <span class="eng-font text-red-900 text-sm tracking-widest">No.${num}</span>
                         <div class="h-px bg-gradient-to-r from-red-900/50 to-transparent flex-grow"></div>
                     </div>
-                    
-                    <!-- メインワード -->
-                    <div class="relative">
+                    <div class="relative z-10">
                         <ruby class="text-sm md:text-base text-gray-500 tracking-[0.3em] font-bold mb-1 block">
                             ${word.jp}<rt class="text-[0.6rem] text-red-700 font-normal tracking-widest">${word.ruby}</rt>
                         </ruby>
@@ -253,62 +232,349 @@
                             ${word.eng}
                         </h3>
                     </div>
-
-                    <!-- 解説文 -->
-                    <p class="mt-4 text-xs md:text-sm text-gray-400 tracking-wider leading-relaxed border-l-2 border-red-900/30 pl-4 group-hover:border-red-600 transition-colors duration-500">
+                    <p class="relative z-10 mt-4 text-xs md:text-sm text-gray-400 tracking-wider leading-relaxed border-l-2 border-red-900/30 pl-4 group-hover:border-red-600 transition-colors duration-500 bg-black/40 p-2 rounded">
                         ${word.desc}
                     </p>
-
-                    <!-- ホバー時の背景オーラ -->
-                    <div class="absolute inset-0 bg-red-900/5 blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+                    <div class="absolute inset-0 bg-red-900/10 blur-xl -z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
                 </div>
             `;
             dictContainer.innerHTML += html;
         });
 
-        // Intersection Observer for scroll animation (フェードインエフェクト)
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.15
-        };
-
-        const observer = new IntersectionObserver((entries, observer) => {
+        // ==========================================
+        // 2. マウス＆スクロールアニメーション (DOM)
+        // ==========================================
+        const observer = new IntersectionObserver((entries, obs) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('active');
-                    observer.unobserve(entry.target); // 一度表示されたら監視を解除
+                    obs.unobserve(entry.target);
                 }
             });
-        }, observerOptions);
-
-        document.querySelectorAll('.reveal').forEach(element => {
-            observer.observe(element);
-        });
-
-        // マウスストーカー (禍々しいオーラ)
-        const cursorGlow = document.getElementById('cursor-glow');
+        }, { threshold: 0.15 });
         
+        // 監視の開始は、メインコンテンツが表示されてから行う
+        function startObserving() {
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
+
+        const cursorGlow = document.getElementById('cursor-glow');
         document.addEventListener('mousemove', (e) => {
-            // requestAnimationFrameを使用してスムーズに追従
             requestAnimationFrame(() => {
                 cursorGlow.style.left = `${e.clientX}px`;
                 cursorGlow.style.top = `${e.clientY}px`;
             });
         });
+        document.addEventListener('mousedown', () => cursorGlow.style.transform = 'translate(-50%, -50%) scale(2)');
+        document.addEventListener('mouseup', () => cursorGlow.style.transform = 'translate(-50%, -50%) scale(1)');
 
-        // マウスクリックでオーラが広がる演出
-        document.addEventListener('mousedown', () => {
-            cursorGlow.style.width = '300px';
-            cursorGlow.style.height = '300px';
-            cursorGlow.style.background = 'radial-gradient(circle, rgba(255, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0) 70%)';
-        });
 
-        document.addEventListener('mouseup', () => {
-            cursorGlow.style.width = '150px';
-            cursorGlow.style.height = '150px';
-            cursorGlow.style.background = 'radial-gradient(circle, rgba(139, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0) 70%)';
-        });
+        // ==========================================
+        // 3. WebGL (Three.js) 棺のアニメーション
+        // ==========================================
+        window.onload = () => {
+            const container = document.getElementById('webgl-container');
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x050000, 0.04); // 深淵の霧
+
+            // カメラ設定
+            const aspect = window.innerWidth / window.innerHeight;
+            const baseZ = aspect < 1 ? 25 : 18; // スマホ対応
+            const camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
+            camera.position.set(0, 15, baseZ);
+            camera.lookAt(0, 0, 0);
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // --- テクスチャ生成 ---
+            // 石のノイズテクスチャ
+            function createStoneTexture() {
+                const cvs = document.createElement('canvas');
+                cvs.width = 512; cvs.height = 512;
+                const ctx = cvs.getContext('2d');
+                const imgData = ctx.createImageData(512, 512);
+                for (let i = 0; i < imgData.data.length; i += 4) {
+                    const noise = Math.random() * 60 + 20;
+                    imgData.data[i] = noise;
+                    imgData.data[i+1] = noise;
+                    imgData.data[i+2] = noise;
+                    imgData.data[i+3] = 255;
+                }
+                ctx.putImageData(imgData, 0, 0);
+                const tex = new THREE.CanvasTexture(cvs);
+                tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
+                tex.repeat.set(2, 4);
+                return tex;
+            }
+
+            // 魔法陣テクスチャ
+            function createMagicCircle() {
+                const cvs = document.createElement('canvas');
+                cvs.width = 512; cvs.height = 512;
+                const ctx = cvs.getContext('2d');
+                ctx.fillStyle = 'black'; ctx.fillRect(0,0,512,512);
+                ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 4;
+                ctx.translate(256, 256);
+                
+                ctx.beginPath(); ctx.arc(0, 0, 240, 0, Math.PI*2); ctx.stroke(); // 外円
+                ctx.beginPath(); ctx.arc(0, 0, 220, 0, Math.PI*2); ctx.stroke(); // 内円
+                
+                // 六芒星
+                for(let j=0; j<2; j++) {
+                    ctx.beginPath();
+                    for(let i=0; i<3; i++) {
+                        const angle = (i * Math.PI*2)/3 + (j * Math.PI/3) - Math.PI/2;
+                        const x = Math.cos(angle)*220; const y = Math.sin(angle)*220;
+                        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+                    }
+                    ctx.closePath(); ctx.stroke();
+                }
+                
+                // 中央の怪しい文字風
+                ctx.font = "bold 60px serif";
+                ctx.fillStyle = "#ffffff";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("X", 0, -20);
+                ctx.fillText("A E", 0, 30);
+
+                return new THREE.CanvasTexture(cvs);
+            }
+
+            const stoneTex = createStoneTexture();
+            const magicTex = createMagicCircle();
+
+            // --- マテリアル ---
+            const stoneMat = new THREE.MeshStandardMaterial({
+                color: 0x111111,
+                roughness: 0.9,
+                metalness: 0.4,
+                bumpMap: stoneTex,
+                bumpScale: 0.05
+            });
+
+            const sealMat = new THREE.MeshStandardMaterial({
+                color: 0x000000,
+                emissive: 0xff0000,
+                emissiveMap: magicTex,
+                emissiveIntensity: 0, // 初期は光らない
+                transparent: true,
+                opacity: 0.9,
+                map: magicTex,
+                blending: THREE.AdditiveBlending
+            });
+
+            // --- ジオメトリ（棺の構築） ---
+            // 1. ベース（下部）
+            const baseGeo = new THREE.BoxGeometry(4, 2, 8);
+            const base = new THREE.Mesh(baseGeo, stoneMat);
+            base.position.y = 1;
+            scene.add(base);
+
+            // 2. 中の空洞表現（黒い箱）
+            const innerGeo = new THREE.BoxGeometry(3.6, 2.1, 7.6);
+            const innerMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            const inner = new THREE.Mesh(innerGeo, innerMat);
+            inner.position.y = 0.1;
+            base.add(inner);
+
+            // 3. 蓋
+            // ヒンジ軸を原点にするため、ジオメトリ自体をずらす
+            const lidGeo = new THREE.BoxGeometry(4.2, 0.4, 8.2);
+            lidGeo.translate(2.1, 0.2, 0); // 左端をX=0に
+            const lid = new THREE.Mesh(lidGeo, stoneMat);
+
+            // 4. 魔法陣の面
+            const sealGeo = new THREE.PlaneGeometry(3.5, 3.5);
+            const seal = new THREE.Mesh(sealGeo, sealMat);
+            seal.rotation.x = -Math.PI / 2;
+            seal.position.set(2.1, 0.41, 0); // 蓋の上中央
+            lid.add(seal);
+
+            // 5. ヒンジ（開閉軸）
+            const hinge = new THREE.Object3D();
+            hinge.position.set(-2.0, 2.0, 0); // ベースの左上の角
+            hinge.add(lid);
+            scene.add(hinge);
+
+            // --- ライティング ---
+            const ambient = new THREE.AmbientLight(0x221133, 0.5);
+            scene.add(ambient);
+
+            const spotLight = new THREE.SpotLight(0xffffff, 0.8);
+            spotLight.position.set(5, 20, 10);
+            spotLight.angle = Math.PI / 4;
+            spotLight.penumbra = 0.5;
+            scene.add(spotLight);
+
+            // 棺の中から漏れる赤い光
+            const insideLight = new THREE.PointLight(0xff0000, 0, 15);
+            insideLight.position.set(0, 2, 0);
+            scene.add(insideLight);
+
+
+            // --- パーティクル（闇のオーラ） ---
+            const pCount = 1500;
+            const pGeo = new THREE.BufferGeometry();
+            const pPos = new Float32Array(pCount * 3);
+            const pVel = new Float32Array(pCount * 3);
+
+            for(let i=0; i<pCount; i++) {
+                pPos[i*3]   = (Math.random() - 0.5) * 3; // X
+                pPos[i*3+1] = Math.random() * 2;         // Y
+                pPos[i*3+2] = (Math.random() - 0.5) * 7; // Z
+                
+                pVel[i*3]   = (Math.random() - 0.5) * 0.02;
+                pVel[i*3+1] = Math.random() * 0.05 + 0.02; // 上昇速度
+                pVel[i*3+2] = (Math.random() - 0.5) * 0.02;
+            }
+            pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+            pGeo.setAttribute('velocity', new THREE.BufferAttribute(pVel, 3));
+
+            // パーティクル用テクスチャ（ソフトな丸）
+            const pCanvas = document.createElement('canvas');
+            pCanvas.width = 32; pCanvas.height = 32;
+            const pCtx = pCanvas.getContext('2d');
+            const pGrad = pCtx.createRadialGradient(16,16,0, 16,16,16);
+            pGrad.addColorStop(0, 'rgba(255,0,50,1)');
+            pGrad.addColorStop(1, 'rgba(0,0,0,0)');
+            pCtx.fillStyle = pGrad; pCtx.fillRect(0,0,32,32);
+            
+            const pMat = new THREE.PointsMaterial({
+                size: 0.4,
+                map: new THREE.CanvasTexture(pCanvas),
+                transparent: true,
+                opacity: 0,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+                color: 0xaa00ff // 紫がかった赤
+            });
+            const particles = new THREE.Points(pGeo, pMat);
+            scene.add(particles);
+
+            // --- アニメーションループ ---
+            const clock = new THREE.Clock();
+            function animate() {
+                requestAnimationFrame(animate);
+                const time = clock.getElapsedTime();
+
+                // 魔法陣の回転
+                seal.rotation.z = time * 0.3;
+
+                // パーティクルの更新 (蓋が開いている時のみ上昇)
+                if (hinge.rotation.z > 0.1) {
+                    pMat.opacity = Math.min(0.8, pMat.opacity + 0.02);
+                    const pos = pGeo.attributes.position.array;
+                    const vel = pGeo.attributes.velocity.array;
+                    for(let i=0; i<pCount; i++) {
+                        pos[i*3]   += vel[i*3];
+                        pos[i*3+1] += vel[i*3+1];
+                        pos[i*3+2] += vel[i*3+2];
+                        // 上まで行ったら棺の中に戻す
+                        if(pos[i*3+1] > 15) {
+                            pos[i*3]   = (Math.random() - 0.5) * 3;
+                            pos[i*3+1] = Math.random() * 2;
+                            pos[i*3+2] = (Math.random() - 0.5) * 7;
+                        }
+                    }
+                    pGeo.attributes.position.needsUpdate = true;
+                } else {
+                    pMat.opacity = Math.max(0, pMat.opacity - 0.05);
+                }
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // --- スクロール連動ロジック ---
+            const mainContent = document.getElementById('main-content');
+            const coffinArea = document.getElementById('coffin-scroll-area');
+            const sealMainText = document.getElementById('seal-text-main');
+            const sealSubText = document.getElementById('seal-text-sub');
+            let hasRevealed = false;
+
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                const wh = window.innerHeight;
+                
+                // ヘッダー領域のプログレス (0 -> 1)
+                const headerP = Math.min(scrollY / wh, 1);
+                
+                // 棺アニメ領域のプログレス (0 -> 1)
+                const coffinStart = wh;
+                const coffinEnd = wh + coffinArea.offsetHeight - wh; // スクロール完了地点
+                let coffinP = 0;
+                if (scrollY > coffinStart) {
+                    coffinP = Math.max(0, Math.min((scrollY - coffinStart) / (coffinEnd - coffinStart), 1));
+                }
+
+                // 1. カメラの接近 (遠くから棺の正面へ)
+                camera.position.y = 15 - (headerP * 5); // 15 -> 10
+                camera.position.z = baseZ - (headerP * (baseZ - 12)); // 遠く -> 12
+                camera.lookAt(0, 1, 0);
+
+                // 2. 魔法陣の発光とテキスト表示 (coffinP: 0.0 -> 0.3)
+                if (coffinP > 0 && coffinP <= 0.3) {
+                    const localP = coffinP / 0.3;
+                    sealMat.emissiveIntensity = localP * 5;
+                    sealMainText.style.opacity = localP;
+                    sealSubText.style.opacity = localP;
+                } else if (coffinP > 0.3) {
+                    sealMat.emissiveIntensity = 5;
+                    sealMainText.style.opacity = Math.max(0, 1 - ((coffinP - 0.3) / 0.1));
+                    sealSubText.style.opacity = Math.max(0, 1 - ((coffinP - 0.3) / 0.1));
+                } else {
+                    sealMat.emissiveIntensity = 0;
+                    sealMainText.style.opacity = 0;
+                    sealSubText.style.opacity = 0;
+                }
+
+                // 3. 蓋の開閉と内部発光 (coffinP: 0.3 -> 0.7)
+                if (coffinP > 0.3 && coffinP <= 0.7) {
+                    const localP = (coffinP - 0.3) / 0.4;
+                    // イージング (ease-in-out)
+                    const easeP = localP < 0.5 ? 2 * localP * localP : 1 - Math.pow(-2 * localP + 2, 2) / 2;
+                    hinge.rotation.z = Math.PI * 0.65 * easeP; // 蓋が開く
+                    insideLight.intensity = easeP * 30; // 中の光が強まる
+                } else if (coffinP > 0.7) {
+                    hinge.rotation.z = Math.PI * 0.65;
+                    insideLight.intensity = 30;
+                } else {
+                    hinge.rotation.z = 0;
+                    insideLight.intensity = 0;
+                }
+
+                // 4. メインコンテンツのフェードイン (coffinP: 0.7 -> 1.0)
+                if (coffinP > 0.75) {
+                    const localP = Math.min((coffinP - 0.75) / 0.25, 1);
+                    mainContent.style.opacity = localP;
+                    mainContent.style.transform = `translateY(${(1 - localP) * 40}px)`;
+                    
+                    if (localP > 0.5) {
+                        mainContent.style.pointerEvents = 'auto';
+                        if (!hasRevealed) {
+                            startObserving(); // 辞書の各項目のアニメーション開始
+                            hasRevealed = true;
+                        }
+                    }
+                } else {
+                    mainContent.style.opacity = 0;
+                    mainContent.style.transform = 'translateY(40px)';
+                    mainContent.style.pointerEvents = 'none';
+                }
+            });
+
+            // リサイズ対応
+            window.addEventListener('resize', () => {
+                const newAspect = window.innerWidth / window.innerHeight;
+                camera.aspect = newAspect;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
     </script>
 </body>
 </html>
